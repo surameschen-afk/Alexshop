@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alex Shop | เช็คราคาสินค้า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0201; --lava1:#ff2d00; --lava2:#ff6a00; --lava3:#ffb300;
+  --text:#fff3ec; --muted:#c99a86;
+  --head:'Kanit','Noto Sans Thai','Tahoma',sans-serif;
+  --body:'Prompt','Noto Sans Thai','Tahoma',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+  background-image:
+   radial-gradient(900px 500px at 15% -5%,rgba(255,45,0,.28),transparent 60%),
+   radial-gradient(800px 500px at 100% 20%,rgba(255,106,0,.16),transparent 60%),
+   radial-gradient(900px 600px at 50% 110%,rgba(255,45,0,.22),transparent 60%);
+  background-attachment:fixed}
+canvas#embers{position:fixed;inset:0;pointer-events:none;z-index:0}
+main,header,footer,nav{position:relative;z-index:1}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 5vw;background:rgba(10,2,1,.72);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,90,30,.25)}
+.logo{font-family:var(--head);font-weight:800;font-size:1.4rem;letter-spacing:1px;
+  background:linear-gradient(90deg,var(--lava3),var(--lava1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:30px;text-decoration:none;color:#fff;
+  font-family:var(--head);font-weight:600;font-size:.95rem;background:linear-gradient(135deg,#5865f2,#3a45c4);
+  box-shadow:0 4px 18px rgba(88,101,242,.5);transition:.2s}
+.nav-btn:hover{transform:translateY(-2px)}
+.nav-btn svg{width:22px;height:22px}
+
+/* HERO */
+header{text-align:center;padding:70px 5vw 30px}
+.tag{display:inline-block;padding:6px 16px;border-radius:30px;border:1px solid rgba(255,120,40,.5);
+  background:rgba(255,70,0,.12);color:var(--lava3);font-size:.85rem;letter-spacing:.5px}
+h1{font-family:var(--head);font-weight:800;font-size:clamp(3rem,13vw,7rem);line-height:1.05;margin:16px 0 10px;
+  background:linear-gradient(100deg,#fff2c2 0%,var(--lava3) 20%,var(--lava2) 45%,var(--lava1) 65%,var(--lava3) 90%);
+  background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:flow 7s ease-in-out infinite alternate;filter:drop-shadow(0 6px 30px rgba(255,60,0,.55))}
+@keyframes flow{to{background-position:100% 0}}
+.lead{max-width:560px;margin:0 auto;color:var(--muted);font-weight:300;font-size:1.05rem;line-height:1.7}
+.cta{margin-top:26px;display:inline-flex;gap:10px;align-items:center;padding:14px 30px;border-radius:40px;text-decoration:none;
+  color:#fff;font-family:var(--head);font-weight:600;font-size:1.05rem;background:linear-gradient(135deg,var(--lava1),var(--lava2));
+  box-shadow:0 8px 30px rgba(255,70,0,.5);transition:.25s}
+.cta:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 40px rgba(255,90,0,.7)}
+.cta svg{width:24px;height:24px}
+
+/* CONTROLS */
+.controls{max-width:1100px;margin:34px auto 6px;padding:0 5vw;display:flex;flex-direction:column;gap:16px;align-items:center}
+.search{width:100%;max-width:480px;position:relative}
+.search input{width:100%;padding:14px 20px 14px 48px;border-radius:40px;border:1px solid rgba(255,110,40,.35);
+  background:rgba(30,8,4,.8);color:#fff;font-family:var(--body);font-size:1rem;outline:none;transition:.2s}
+.search input:focus{border-color:var(--lava2);box-shadow:0 0 0 4px rgba(255,100,0,.2),0 0 24px rgba(255,80,0,.35)}
+.search::before{content:"🔍";position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:1rem}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.tab{padding:9px 20px;border-radius:30px;cursor:pointer;font-family:var(--head);font-weight:600;font-size:.95rem;color:var(--muted);
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,120,60,.25);transition:.2s}
+.tab:hover{color:#fff;border-color:var(--lava2)}
+.tab.on{color:#fff;background:linear-gradient(135deg,var(--lava1),var(--lava2));border-color:transparent;box-shadow:0 4px 20px rgba(255,70,0,.45)}
+
+/* SECTIONS */
+.sec{max-width:1100px;margin:42px auto 0;padding:0 5vw}
+.sec-h{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.sec-h h2{font-family:var(--head);font-weight:800;font-size:1.7rem}
+.sec-h .line{flex:1;height:2px;background:linear-gradient(90deg,var(--lava2),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+
+/* CARD */
+.card{position:relative;padding:20px 18px 22px;border-radius:22px;text-align:center;overflow:hidden;border:1px solid transparent;
+  background:linear-gradient(160deg,#241008,#120504) padding-box,
+             linear-gradient(135deg,rgba(255,150,60,.8),rgba(255,45,0,.25) 50%,rgba(255,150,60,.5)) border-box;
+  transition:transform .3s,box-shadow .3s}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,200,140,.13) 50%,transparent 60%);
+  transform:translateX(-120%);transition:transform .7s}
+.card:hover{transform:translateY(-8px);box-shadow:0 18px 44px rgba(255,60,0,.4)}
+.card:hover::after{transform:translateX(120%)}
+.card.limited{box-shadow:0 0 26px rgba(255,50,0,.28)}
+.ribbon{position:absolute;top:12px;left:12px;z-index:2;padding:4px 12px;border-radius:20px;font-family:var(--head);font-weight:600;font-size:.75rem;
+  background:linear-gradient(90deg,var(--lava1),var(--lava2));box-shadow:0 2px 12px rgba(255,50,0,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 2px 22px rgba(255,120,0,.95)}}
+.stage{position:relative;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.stage::before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,90,20,.45),transparent 65%);animation:breathe 3.5s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.2);opacity:.7}}
+.stage svg{position:relative;width:200px;height:120px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7));transition:transform .4s}
+.card:hover .stage svg{transform:scale(1.1) rotate(-3deg)}
+.pink .stage svg{filter:hue-rotate(-52deg) saturate(1.5) drop-shadow(0 8px 14px rgba(0,0,0,.7))}
+.pink .stage::before{background:radial-gradient(circle,rgba(255,80,170,.45),transparent 65%)}
+.name{font-family:var(--head);font-weight:600;font-size:1.25rem}
+.price{margin-top:10px;font-family:var(--head);font-weight:800;font-size:2.2rem;line-height:1;
+  background:linear-gradient(180deg,#fff0b8,var(--lava3) 45%,var(--lava2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.price small{font-size:1rem;font-weight:400;color:var(--muted);-webkit-text-fill-color:var(--muted);margin-left:4px}
+
+/* FARM */
+.farm .money{font-size:3.4rem;line-height:1;margin:8px 0 2px;filter:drop-shadow(0 6px 14px rgba(255,150,0,.5));animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.farm .amount{font-family:var(--head);font-weight:800;font-size:1.9rem}
+.farm .stage{height:90px}
+
+.empty{display:none;text-align:center;color:var(--muted);margin:50px 0}
+.how{max-width:1100px;margin:60px auto 0;padding:0 5vw}
+.how-box{border-radius:24px;padding:30px;text-align:center;border:1px solid rgba(255,110,40,.3);
+  background:linear-gradient(135deg,rgba(255,45,0,.14),rgba(255,160,0,.06))}
+.how-box h3{font-family:var(--head);font-size:1.5rem;margin-bottom:8px}
+.how-box p{color:var(--muted);font-weight:300;margin-bottom:18px}
+footer{text-align:center;padding:50px 5vw 100px;color:#8d6455;font-size:.85rem}
+.float-dc{position:fixed;right:18px;bottom:18px;z-index:30;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(135deg,#5865f2,#3a45c4);box-shadow:0 8px 28px rgba(88,101,242,.65);transition:.2s;color:#fff}
+.float-dc:hover{transform:scale(1.12) rotate(-6deg)}
+.float-dc svg{width:34px;height:34px}
+@media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr);gap:14px}.stage svg{width:150px;height:90px}
+  .stage{height:100px}.name{font-size:1.02rem}.price{font-size:1.7rem}.farm .money{font-size:2.6rem}}
+</style>
+</head>
+<body>
+<canvas id="embers"></canvas>
+
+<!-- ===== ภาพ SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffe2c4"/><stop offset=".25" stop-color="#ff9a52"/>
+    <stop offset=".6" stop-color="#d1330a"/><stop offset="1" stop-color="#6b1500"/>
+  </linearGradient>
+  <linearGradient id="dark" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#6a2a18"/><stop offset=".5" stop-color="#3a140a"/><stop offset="1" stop-color="#1a0703"/>
+  </linearGradient>
+  <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#d98c00"/>
+  </linearGradient>
+
+  <!-- กล็อก / พิสตอล -->
+  <symbol id="pistol" viewBox="0 0 200 120">
+    <path d="M34 48H152V58H120Q113 58 111 64L107 70H90V62H74L60 106Q59 111 53 111H40Q33 111 34 105Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M62 80l8 2M60 88l9 2M58 96l9 2" stroke="#ff7a3c" stroke-opacity=".5" stroke-width="1.5"/>
+    <path d="M90 62V74Q90 77 94 77H104" fill="none" stroke="#2a0700" stroke-width="2.5"/>
+    <rect x="95" y="62" width="3" height="9" fill="#2a0700"/>
+    <path d="M24 26H150L164 32V48H24Z" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M28 31H148" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+    <g fill="#2a0700" opacity=".7"><rect x="30" y="34" width="2.6" height="12"/><rect x="36" y="34" width="2.6" height="12"/><rect x="42" y="34" width="2.6" height="12"/></g>
+    <rect x="26" y="21" width="9" height="5" fill="#2a0700"/><rect x="144" y="21" width="6" height="5" fill="#2a0700"/>
+    <rect x="164" y="36" width="5" height="8" fill="#2a0700"/>
+    <rect x="70" y="35" width="26" height="4" rx="1" fill="#2a0700" opacity=".55"/>
+  </symbol>
+
+  <!-- ลูกโม่ -->
+  <symbol id="revolver" viewBox="0 0 200 120">
+    <path d="M56 66L42 108Q41 113 47 113H64Q70 113 71 108L82 70Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M52 86l10 2M50 94l10 2M48 102l10 2" stroke="#ff7a3c" stroke-opacity=".5" stroke-width="1.5"/>
+    <path d="M26 32H126L142 42V60H92L84 70H64L58 60H30Q26 60 26 56Z" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <rect x="124" y="38" width="68" height="15" rx="3" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <rect x="128" y="40" width="60" height="3" rx="1.5" fill="#fff" opacity=".5"/>
+    <rect x="186" y="31" width="5" height="7" fill="#2a0700"/>
+    <path d="M28 32L20 20L34 22L36 32Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <rect x="82" y="28" width="38" height="36" rx="8" fill="url(#metal)" stroke="#2a0700" stroke-width="2"/>
+    <g fill="#2a0700" opacity=".75"><rect x="92" y="32" width="3" height="28" rx="1.5"/><rect x="104" y="32" width="3" height="28" rx="1.5"/></g>
+    <circle cx="101" cy="46" r="3" fill="url(#brass)"/>
+    <path d="M62 62Q76 76 90 66" fill="none" stroke="#2a0700" stroke-width="2.5"/>
+  </symbol>
+
+  <!-- MP5 -->
+  <symbol id="smg" viewBox="0 0 200 120">
+    <path d="M4 38H34V60H8Q4 60 4 56Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M60 64L50 100Q49 104 54 104H65Q69 104 70 100L78 64Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M92 64L96 108Q97 113 103 112L116 108Q120 106 119 101L108 64Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M100 74l14 -2M101 84l14 -2M102 94l14 -2" stroke="#ff7a3c" stroke-opacity=".5" stroke-width="1.5"/>
+    <rect x="32" y="38" width="88" height="26" rx="4" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <rect x="36" y="41" width="80" height="3" rx="1.5" fill="#fff" opacity=".5"/>
+    <rect x="76" y="47" width="24" height="6" rx="1" fill="#2a0700" opacity=".7"/>
+    <rect x="118" y="40" width="52" height="24" rx="4" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <g stroke="#ff7a3c" stroke-opacity=".5"><path d="M126 46h36M126 52h36M126 58h36"/></g>
+    <rect x="168" y="48" width="24" height="7" rx="2" fill="url(#metal)" stroke="#2a0700"/>
+    <rect x="190" y="44" width="8" height="15" rx="2" fill="#2a0700"/>
+    <rect x="38" y="30" width="12" height="8" fill="#2a0700"/><rect x="158" y="30" width="5" height="10" fill="#2a0700"/>
+  </symbol>
+
+  <!-- ซองแฝด -->
+  <symbol id="dualmag" viewBox="0 0 200 120">
+    <g transform="rotate(-7 70 60)">
+      <rect x="46" y="22" width="46" height="90" rx="7" fill="url(#metal)" stroke="#2a0700" stroke-width="2"/>
+      <rect x="52" y="10" width="34" height="14" rx="3" fill="url(#brass)" stroke="#2a0700"/>
+      <g fill="#2a0700" opacity=".6"><rect x="56" y="38" width="26" height="5" rx="2"/><rect x="56" y="52" width="26" height="5" rx="2"/><rect x="56" y="66" width="26" height="5" rx="2"/></g>
+    </g>
+    <g transform="rotate(7 130 60)">
+      <rect x="108" y="22" width="46" height="90" rx="7" fill="url(#metal)" stroke="#2a0700" stroke-width="2"/>
+      <rect x="114" y="10" width="34" height="14" rx="3" fill="url(#brass)" stroke="#2a0700"/>
+      <g fill="#2a0700" opacity=".6"><rect x="118" y="38" width="26" height="5" rx="2"/><rect x="118" y="52" width="26" height="5" rx="2"/><rect x="118" y="66" width="26" height="5" rx="2"/></g>
+    </g>
+    <rect x="82" y="50" width="38" height="18" rx="3" fill="#ffb300" stroke="#2a0700" stroke-width="1.5"/>
+    <g stroke="#2a0700" stroke-width="3" opacity=".55"><path d="M90 50l-6 18M100 50l-6 18M110 50l-6 18"/></g>
+  </symbol>
+
+  <!-- อีโบ๊ะ -->
+  <symbol id="ebo" viewBox="0 0 200 120">
+    <path d="M44 50H166V60H132Q125 60 122 66L116 72H96V64H80L64 108Q63 113 57 113H44Q37 113 38 107Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M62 86l9 2M60 94l9 2M58 102l9 2" stroke="#ff7a3c" stroke-opacity=".5" stroke-width="1.5"/>
+    <path d="M30 28H168Q180 28 184 36V50H30Z" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M36 33H170" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+    <g fill="#2a0700" opacity=".75"><rect x="136" y="35" width="3" height="12" rx="1"/><rect x="144" y="35" width="3" height="12" rx="1"/><rect x="152" y="35" width="3" height="12" rx="1"/><rect x="160" y="35" width="3" height="12" rx="1"/></g>
+    <rect x="34" y="22" width="10" height="6" fill="#2a0700"/><rect x="170" y="22" width="6" height="6" fill="#2a0700"/>
+    <rect x="184" y="38" width="8" height="8" rx="2" fill="#2a0700"/>
+    <path d="M96 64V76Q96 79 100 79H110" fill="none" stroke="#2a0700" stroke-width="2.5"/>
+  </symbol>
+
+  <!-- ปืนแปลงแม็คยาว -->
+  <symbol id="longmag" viewBox="0 0 200 120">
+    <path d="M34 36H152V46H120Q113 46 111 52L107 58H90V50H74L62 92H50L44 100H34L38 74Z" fill="url(#dark)" stroke="#2a0700" stroke-width="1.5"/>
+    <rect x="46" y="86" width="30" height="31" rx="4" fill="url(#metal)" stroke="#2a0700" stroke-width="2"/>
+    <g fill="#2a0700" opacity=".65"><rect x="52" y="93" width="18" height="4" rx="1.5"/><rect x="52" y="101" width="18" height="4" rx="1.5"/><rect x="52" y="109" width="18" height="4" rx="1.5"/></g>
+    <path d="M24 14H150L164 20V36H24Z" fill="url(#metal)" stroke="#2a0700" stroke-width="1.5"/>
+    <path d="M28 19H148" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+    <g fill="#2a0700" opacity=".7"><rect x="30" y="22" width="2.6" height="12"/><rect x="36" y="22" width="2.6" height="12"/><rect x="42" y="22" width="2.6" height="12"/></g>
+    <rect x="26" y="9" width="9" height="5" fill="#2a0700"/><rect x="144" y="9" width="6" height="5" fill="#2a0700"/>
+    <rect x="164" y="24" width="14" height="8" rx="2" fill="#2a0700"/>
+  </symbol>
+
+  <!-- Discord -->
+  <symbol id="discord" viewBox="0 0 64 64">
+    <path fill="currentColor" d="M52 14c-4-3-9-5-14-6l-1 3c-3-1-7-1-10 0l-1-3c-5 1-10 3-14 6-7 10-9 21-8 31 5 4 11 7 17 8l3-5c-2-1-4-2-6-3l1-1c8 4 18 4 26 0l1 1c-2 1-4 2-6 3l3 5c6-1 12-4 17-8 1-11-2-22-8-31zM25 40c-3 0-5-2-5-5s2-5 5-5 5 2 5 5-2 5-5 5zm14 0c-3 0-5-2-5-5s2-5 5-5 5 2 5 5-2 5-5 5z"/>
+  </symbol>
+</defs>
+</svg>
+
+<nav>
+  <div class="logo">🔥 ALEX SHOP</div>
+  <a class="nav-btn" href="https://discord.gg/h8bn3dnJ2X" target="_blank" rel="noopener"><svg><use href="#discord"/></svg>สั่งซื้อ</a>
+</nav>
+
+<header>
+  <span class="tag">ราคาสินค้าอัปเดตล่าสุด</span>
+  <h1>Alex Shop</h1>
+  <p class="lead">เช็คราคาปืนและฟาร์มเงินได้ในที่เดียว ราคาชัด ไม่ต้องเดา เจอของที่ถูกใจแล้วทักมาสั่งซื้อทางดิสคอร์ดได้เลย</p>
+  <a class="cta" href="https://discord.gg/h8bn3dnJ2X" target="_blank" rel="noopener"><svg><use href="#discord"/></svg>เข้าดิสคอร์ดเพื่อสั่งซื้อ</a>
+</header>
+
+<main>
+  <div class="controls">
+    <div class="search"><input id="q" type="text" placeholder="ค้นหาสินค้า เช่น กล็อก, mp5, 300k..."></div>
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-f="all">ทั้งหมด</div>
+      <div class="tab" data-f="limited">⚡ มีจำกัด</div>
+      <div class="tab" data-f="gun">🔫 ปืน</div>
+      <div class="tab" data-f="farm">💸 ฟาร์ม</div>
+    </div>
+  </div>
+
+  <section class="sec" id="s-limited"><div class="sec-h"><h2>⚡ สินค้ามีจำกัด</h2><div class="line"></div></div><div class="grid" id="g-limited"></div></section>
+  <section class="sec" id="s-gun"><div class="sec-h"><h2>🔫 สินค้าทั่วไป</h2><div class="line"></div></div><div class="grid" id="g-gun"></div></section>
+  <section class="sec" id="s-farm"><div class="sec-h"><h2>💸 ฟาร์มเงิน</h2><div class="line"></div></div><div class="grid" id="g-farm"></div></section>
+  <p class="empty" id="empty">ไม่พบสินค้าที่ค้นหา</p>
+
+  <div class="how">
+    <div class="how-box">
+      <h3>สั่งซื้อง่ายๆ ผ่านดิสคอร์ด</h3>
+      <p>กดเข้าดิสคอร์ด บอกชื่อสินค้าที่ต้องการ แล้วรอรับของได้เลย</p>
+      <a class="cta" href="https://discord.gg/h8bn3dnJ2X" target="_blank" rel="noopener"><svg><use href="#discord"/></svg>ไปที่ Discord</a>
+    </div>
+  </div>
+</main>
+
+<footer>© Alex Shop · ราคาเป็นหน่วยบาท</footer>
+<a class="float-dc" href="https://discord.gg/h8bn3dnJ2X" target="_blank" rel="noopener" aria-label="Discord"><svg><use href="#discord"/></svg></a>
+
+<script>
+const guns = [
+  {n:"MP5", p:25, i:"smg", l:1},
+  {n:"กล็อกสวิต", p:15, i:"pistol", l:1},
+  {n:"ซองแฝด", p:20, i:"dualmag", l:1},
+  {n:"อีโบ๊ะชมพู", p:10, i:"ebo", l:1, pink:1},
+  {n:"ลูกโม่อัพเกรด", p:5, i:"revolver"},
+  {n:"กล็อก", p:4, i:"pistol"},
+  {n:"ปืนแปลงแม็คยาว", p:3, i:"longmag"},
+  {n:"ลูกโม่", p:4, i:"revolver"},
+  {n:"อีโบ๊ะ", p:4, i:"ebo"},
+  {n:"M1911", p:8, i:"pistol"}
+];
+const farm = [
+  {k:"100k",p:8},{k:"200k",p:16},{k:"300k",p:24},{k:"400k",p:32},{k:"500k",p:40}
+];
+
+const gunCard = x => `<div class="card${x.l?' limited':''}${x.pink?' pink':''}">
+  ${x.l?'<div class="ribbon">มีจำกัด!</div>':''}
+  <div class="stage"><svg><use href="#${x.i}"/></svg></div>
+  <div class="name">${x.n}</div>
+  <div class="price">${x.p}<small>บาท</small></div></div>`;
+const farmCard = x => `<div class="card farm">
+  <div class="stage"><div class="money">💸</div></div>
+  <div class="name amount">💸 ${x.k}</div>
+  <div class="price">${x.p}<small>บาท</small></div></div>`;
+
+let filter="all", term="";
+const $ = id => document.getElementById(id);
+function render(){
+  const t = term.trim().toLowerCase();
+  const g = guns.filter(x=>x.n.toLowerCase().includes(t));
+  const f = farm.filter(x=>(x.k+" ฟาร์ม farm").toLowerCase().includes(t));
+  const show = {
+    limited:(filter==="all"||filter==="limited") ? g.filter(x=>x.l) : [],
+    gun:(filter==="all"||filter==="gun") ? g.filter(x=>!x.l) : [],
+    farm:(filter==="all"||filter==="farm") ? f : []
+  };
+  if(filter==="gun") show.limited = g.filter(x=>x.l);
+  $("g-limited").innerHTML = show.limited.map(gunCard).join("");
+  $("g-gun").innerHTML = show.gun.map(gunCard).join("");
+  $("g-farm").innerHTML = show.farm.map(farmCard).join("");
+  for(const k of ["limited","gun","farm"]) $("s-"+k).style.display = show[k].length ? "" : "none";
+  $("empty").style.display = (show.limited.length+show.gun.length+show.farm.length) ? "none" : "block";
+}
+$("q").addEventListener("input",e=>{term=e.target.value;render()});
+$("tabs").addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(!t) return;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on"); filter=t.dataset.f; render();
+});
+render();
+
+/* ประกายไฟลอย */
+const cv=$("embers"), cx=cv.getContext("2d"); let W,H,ps=[];
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+addEventListener("resize",size); size();
+function mk(init){return{x:Math.random()*W,y:init?Math.random()*H:H+10,r:Math.random()*2.2+.6,
+  vy:Math.random()*.9+.3,vx:(Math.random()-.5)*.4,a:Math.random()*.6+.3,ph:Math.random()*6}}
+for(let i=0;i<70;i++)ps.push(mk(true));
+(function loop(){
+  cx.clearRect(0,0,W,H);
+  for(const p of ps){
+    p.y-=p.vy; p.x+=p.vx+Math.sin(p.ph+=.02)*.3; p.a-=.0008;
+    if(p.y<-10||p.a<=0)Object.assign(p,mk(false));
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,6.283);
+    cx.fillStyle=`rgba(255,${120+Math.random()*80|0},40,${p.a})`;
+    cx.shadowColor="#ff6a00"; cx.shadowBlur=10; cx.fill();
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
